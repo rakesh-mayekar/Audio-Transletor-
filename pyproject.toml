@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "offline-live-translator"
+version = "0.1.0"
+description = "Offline cross-platform live subtitle translator (shared core)"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.6",
+    "numpy>=1.26",
+    "platformdirs>=4.0",
+]
+
+[project.optional-dependencies]
+ai = ["faster-whisper>=1.1", "huggingface_hub>=0.24"]
+windows = ["PyAudioWPatch>=0.2.12; sys_platform == 'win32'"]
+gui = ["PySide6>=6.6"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.5", "mypy>=1.10", "psutil>=5.9"]
+
+[tool.setuptools.packages.find]
+include = ["core*", "oslayer*", "ai*", "app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "ai: needs an installed Whisper model (run scripts/install_models.py first)",
+    "windows: runs only on Windows",
+    "macos: runs only on macOS",
+    "linux: runs only on Linux",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["core", "oslayer", "ai", "app"]
+
+[[tool.mypy.overrides]]
+module = ["faster_whisper.*", "ctranslate2.*", "onnxruntime.*", "PySide6.*", "pyaudiowpatch.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# PySide6 is optional; without it QObject/QWidget are Any, with it the ignores are needed.
+module = ["app.overlay_qt"]
+disallow_subclassing_any = false
+warn_unused_ignores = false
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
