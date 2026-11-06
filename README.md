@@ -10,3 +10,4 @@ Start with `docs/FINAL_STATUS.md` (what is and is not verified). Per-phase detai
     python scripts/install_models.py --model small --allow-network    # one-time download
     python -m app --doctor
 # audio-translation
+# Audio-Transletor-
